@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Multiselect</title>
+<style>
+</style>
+</head>
+<body>
+<h1>Multiselect</h1>
+<div class="status" aria-live="polite"></div>
+
+<p><a href="#">Dummy Link</a></p>
+
+<h2>Multiselect using two native select elements</h2>
+<fieldset class="multiselect" id="multiselect-native" aria-describedby="multiselect-native-description"><legend>multiselect native</legend>
+<p id="multiselect-native-description">This uses two native HTML select elements.</p>
+
+<select aria-label="choose" class="choices" rows="1">
+</select>
+
+<select aria-label="selection" class="values" rows="1">
+</select>
+</fieldset><!-- .multiselect -->
+
+
+<h2>Multiselect using two native select elements</h2>
+<div id="multiselect-list" class="multiselect" role="group" aria-labelledby="multiselect-list-label" aria-describedby="multiselect-list-description">
+<span id="multiselect-list-label">multiselect using lists</span>
+<p id="multiselect-list-description">This uses two html unordered list elements.</p>
+
+<ul aria-label="choose" id="multiselect-list-choices" class="choices">
+</ul>
+
+<ul aria-label="selection" id="multiselect-list-values" class="values">
+</ul>
+</div>
+
+<p><a href="#">Dummy Link</a></p>
+
+<div id="debug" role="region" aria-label="Debug" aria-live="polite">
+</div>
+
+<script src="http://code.jquery.com/jquery.min.js"></script>
+<script src="keyboardNavigation.js"></script>
+<script src="debug.js"></script>
+<script>
+"use strict";
+createChoices ($(".multiselect .choices"));
+
+$(".multiselect").each (function () {
+var $self = $(this);
+var $choices = $self.find (".choices");
+var $values = $self.find (".values");
+
+keyboardNavigation ($choices);
+keyboardNavigation  ($values);
+
+$choices.on ("click", "option, [role=option], .option", function (e) {
+addValue ($(e.target));
+update ();
+return false;
+});
+
+$values.on ("click", "option, [role=option], .option", function (e) {
+removeValue ($(e.target));
+update ();
+return false;
+});
+
+$self.on ("keydown", "select, [role=option], .option", function (e) {
+var key = e.key || e.which || e.keyCode;
+var $node;
+
+if (key === "Enter" || key === " " || key === 13 || key === 32) {
+//debug ("keydown: ", key, e.target.nodeName);
+$node = current($(e.target));
+//debug ("current: ", $node.length,  $node.text());
+$node.trigger ("click");
+return false;
+} // if
+
+return true;
+});
+
+
+/// helpers
+
+
+function current ($node) {
+//debugger;
+if ($node.is ("select")) return $node.find (":selected");
+else if ($node.is("[role=listbox]")) return $node.addBack().find("[tabindex='0']").first();
+else return $node;
+} // current
+
+function addValue ($node) {
+//debug ("addValue: ", $node[0].nodeName, $values[0].nodeName);
+$node = $node.detach();
+$node.removeAttr("tabindex");
+$values.append ($node);
+return $node.text();
+} // addValue
+
+function removeValue ($node) {
+$node = $node.detach();
+$node.removeAttr("tabindex");
+$choices.append ($node);
+return $node.text();
+} // removeValue
+
+function update () {
+$choices.trigger("change");
+$values.trigger("change");
+statusMessage ($values.children().length + " items selected");
+} // update
+}); // each .multiselect
+
+function statusMessage (message) {
+$(".status").html("").text(message);
+} // statusMessage
+
+
+function createChoices ($lists) {
+$lists.each (function () {
+var $list = $(this);
+var nodeName = $list[0].nodeName.toLowerCase();
+debug ("create: ", nodeName);
+var option = "option";
+var $element;
+if (nodeName === "ul") option = "li";
+else if (nodeName === "div") option = "span";
+
+if (! option) {
+alert ($list.nodeName + " is an invalid container; must be 'ul', 'select', or 'div'");
+return;
+} // if
+
+
+for (var i=0; i<100; i++) {
+$element = $('<' + option + '></' + option + '>\n');
+$element.text (i);
+$list.append ($element);
+} // for
+}); // each
+} // createChoices
+
+
+alert ("loaded");
+</script>
+
+
+</body>
+</html>
