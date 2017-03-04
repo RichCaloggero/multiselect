@@ -53,30 +53,27 @@ var $self = $(this);
 var $choices = $self.find (".choices");
 var $values = $self.find (".values");
 
-keyboardNavigation ($choices);
-keyboardNavigation  ($values);
+var choices_selection = keyboardNavigation ($choices);
+var values_selection = keyboardNavigation  ($values);
 
-$choices.on ("click", "option, [role=option], .option", function (e) {
-addValue ($(e.target));
-update ();
+$choices.on ("click", function (e) {
+addValue (choices_selection());
+choices_selection().focus();
 return false;
 });
 
-$values.on ("click", "option, [role=option], .option", function (e) {
-removeValue ($(e.target));
-update ();
+$values.on ("click", function (e) {
+removeValue (values_selection());
+values_selection().focus();
 return false;
 });
 
-$self.on ("keydown", "select, [role=option], .option", function (e) {
+$self.on ("keydown", ".choices, .values", function (e) {
 var key = e.key || e.which || e.keyCode;
 var $node;
 
-if (key === "Enter" || key === " " || key === 13 || key === 32) {
-//debug ("keydown: ", key, e.target.nodeName);
-$node = current($(e.target));
-//debug ("current: ", $node.length,  $node.text());
-$node.trigger ("click");
+if (key === "Enter" || key === " ") {
+$(e.currentTarget).trigger ("click");
 return false;
 } // if
 
@@ -87,18 +84,13 @@ return true;
 /// helpers
 
 
-function current ($node) {
-//debugger;
-if ($node.is ("select")) return $node.find (":selected");
-else if ($node.is("[role=listbox]")) return $node.addBack().find("[tabindex='0']").first();
-else return $node;
-} // current
 
 function addValue ($node) {
-//debug ("addValue: ", $node[0].nodeName, $values[0].nodeName);
+//debug ("addValue: ", $node[0].nodeName, $node.text());
 $node = $node.detach();
-$node.removeAttr("tabindex");
 $values.append ($node);
+choices_selection ($choices.children().first());
+values_selection ($node);
 return $node.text();
 } // addValue
 
@@ -106,6 +98,8 @@ function removeValue ($node) {
 $node = $node.detach();
 $node.removeAttr("tabindex");
 $choices.append ($node);
+choices_selection ($node);
+values_selection ($values.children().first());
 return $node.text();
 } // removeValue
 
@@ -125,7 +119,7 @@ function createChoices ($lists) {
 $lists.each (function () {
 var $list = $(this);
 var nodeName = $list[0].nodeName.toLowerCase();
-debug ("create: ", nodeName);
+//debug ("create: ", nodeName);
 var option = "option";
 var $element;
 if (nodeName === "ul") option = "li";
