@@ -8,6 +8,11 @@ To use, simply load the "multiselect.js" file via script element. It looks for i
 
 Also required is "keyboardNavigation.js" from https://github.com/RichCaloggero/keyboard-navigation.git
 
+## Demo
+
+http://www.mit.edu/~rjc/aria/multiselect/multiselect.html
+
+The demo implements the following two examples...
 
 ## Examples
 
