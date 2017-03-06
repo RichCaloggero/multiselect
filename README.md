@@ -6,7 +6,9 @@ _No attempt is made to order items; items are simply appended_.
 
 To use, simply load the "multiselect.js" file via script element. It looks for items with class "multiselect" which contain two lists, the first with class "choices", the second with class "values".
 
-Also required is "keyboardNavigation.js" from https://github.com/RichCaloggero/keyboard-navigation.git
+## Required
+- "jquery" from http://jquery.com/
+- "keyboardNavigation.js" from https://github.com/RichCaloggero/keyboard-navigation.git
 
 ## Demo
 
